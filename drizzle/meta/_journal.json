@@ -8,6 +8,13 @@
       "when": 1758690428376,
       "tag": "0000_create-users-table",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1758811929000,
+      "tag": "0001_create-products-table",
+      "breakpoints": true
     }
   ]
 }

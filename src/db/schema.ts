@@ -1,4 +1,5 @@
-import { pgEnum } from "drizzle-orm/pg-core";
+import { numeric, pgEnum } from "drizzle-orm/pg-core";
+import { serial } from "drizzle-orm/pg-core";
 import { boolean } from "drizzle-orm/pg-core";
 import { pgTable, uuid, varchar, timestamp, text } from "drizzle-orm/pg-core";
 export const userRoleEnum = pgEnum("user_role", ["admin", "user"]);
@@ -14,4 +15,15 @@ export const users = pgTable("users", {
   confirm_token: varchar("confirm_token", { length: 255 }),
   created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updated_at: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+});
+
+
+export const products = pgTable("products", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  imageUrl: varchar("image_url", { length: 500 }),
+  price: numeric("price", { precision: 10, scale: 2 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
