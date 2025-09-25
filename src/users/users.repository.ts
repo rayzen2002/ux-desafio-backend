@@ -45,5 +45,6 @@ export class UsersRepository {
     .returning()
 
     if(!user) throw new Error('Token inválido ou expirado')
+    return user
   }
 }
