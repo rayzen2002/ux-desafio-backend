@@ -1,4 +1,5 @@
 import { numeric, pgEnum } from "drizzle-orm/pg-core";
+import { integer } from "drizzle-orm/pg-core";
 import { serial } from "drizzle-orm/pg-core";
 import { boolean } from "drizzle-orm/pg-core";
 import { pgTable, uuid, varchar, timestamp, text } from "drizzle-orm/pg-core";
@@ -24,6 +25,28 @@ export const products = pgTable("products", {
   description: text("description"),
   imageUrl: varchar("image_url", { length: 500 }),
   price: numeric("price", { precision: 10, scale: 2 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const carts = pgTable("carts", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const cartItems = pgTable("cart_items", {
+  id: serial("id").primaryKey(),
+  cartId: uuid("cart_id")
+    .notNull()
+    .references(() => carts.id, { onDelete: "cascade" }),
+  productId: integer("product_id")
+    .notNull()
+    .references(() => products.id, { onDelete: "cascade" }),
+  quantity: integer("quantity").notNull().default(1),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

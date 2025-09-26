@@ -15,6 +15,13 @@
       "when": 1758811929000,
       "tag": "0001_create-products-table",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1758837710696,
+      "tag": "0002_create-carts-table-and-carts-items-table",
+      "breakpoints": true
     }
   ]
 }
