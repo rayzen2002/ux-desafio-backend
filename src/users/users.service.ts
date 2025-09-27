@@ -27,7 +27,7 @@ export class UsersService {
 
       console.log(`Para ativar a conta, acesse: http://localhost:3000/users/confirm?token=${user.confirm_token}`);
       return {id: user.id, email: user.email, confirm_token: confirmToken}
-    }
+  }
   async activateUser(confirmToken: string){
     const user = await this.usersRepository.activateUser(confirmToken)
     

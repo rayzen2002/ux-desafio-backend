@@ -11,7 +11,7 @@ export class CartRepository {
   const [cart] = await db.insert(carts).values({ userId }).returning()
 
   return {...cart , items: [] }
- }
+}
 
  async findCartByUserId(userId: string) {
   const [cart] = await db.select().from(carts).where(eq(carts.userId, userId))
