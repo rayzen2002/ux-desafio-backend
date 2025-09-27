@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { eq, type InferSelectModel } from 'drizzle-orm';
-import { db } from 'src/db';
-import { users } from 'src/db/schema';
+import { db } from '../db';
+import { users } from '../db/schema';
 
 export type User = InferSelectModel<typeof users>;
 
