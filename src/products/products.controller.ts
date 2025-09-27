@@ -12,7 +12,7 @@ import {
   UsePipes,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
-import { ZodValidationPipe } from 'src/common/pipes/zod-validation.pipe';
+import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import {
   CreateProductSchema,
   PaginationSchema,
@@ -21,8 +21,8 @@ import {
   type PaginationDto,
   type UpdateProductDto,
 } from './dto/create-products.dto';
-import { RolesGuard } from 'src/auth/jwt.guard';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { RolesGuard } from '../auth/jwt.guard';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}

@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { eq, ilike, sql, type InferSelectModel } from 'drizzle-orm';
-import { db } from 'src/db';
-import { products } from 'src/db/schema';
+import { db } from '../db';
+import { products } from '../db/schema';
 import type { CreateProductDto } from './dto/create-products.dto';
 import { RedisHelper } from '../redis/utils/redis-helpers';
 
