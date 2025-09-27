@@ -11,8 +11,8 @@ import { JwtStrategy } from './jwt.strategy';
     JwtModule.register({
       global: true,
       secret: process.env.JWT_SECRET || 'ux-challenge-secret',
-      signOptions: { expiresIn: '1h' }
-    })
+      signOptions: { expiresIn: '1h' },
+    }),
   ],
   providers: [AuthService, JwtStrategy],
   controllers: [AuthController],
