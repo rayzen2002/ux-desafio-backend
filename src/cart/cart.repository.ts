@@ -7,6 +7,7 @@ export type Carts = InferSelectModel<typeof carts>;
 
 @Injectable()
 export class CartRepository {
+ 
   async createCart(userId: string) {
     const [cart] = await db.insert(carts).values({ userId }).returning();
 
