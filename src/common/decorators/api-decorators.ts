@@ -1,6 +1,6 @@
 import { applyDecorators } from "@nestjs/common";
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse } from "@nestjs/swagger";
-import { CreateProductSwaggerDto, PaginatedProductsSwaggerDto } from "../../products/dto/product-example.dto";
+import { CreateProductSwaggerDto, PaginatedProductsSwaggerDto, UpdateProductSwaggerDto } from "../../products/dto/product-example.dto";
 
 export function ApiListOperation(resourceName: string) {
   return applyDecorators(
@@ -78,6 +78,7 @@ export function ApiUpdateOperation(resourceName: string, bodyType?: any) {
     ApiResponse({
       status: 200,
       description: `${resourceName} atualizado com sucesso`,
+      type: UpdateProductSwaggerDto,
       schema: {
         example: {
               id: 1,

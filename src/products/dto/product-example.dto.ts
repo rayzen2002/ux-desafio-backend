@@ -24,10 +24,10 @@ export class ProductResponseSwaggerDto {
   description?: string
 
   @ApiProperty({
-    example: 8500,
+    example: "8500.99",
     description: 'Preço do produto em R$',
   })
-  price: number
+  price: string
    @ApiProperty({
     example: 'http://exemplo.com/notebook.jpg',
     description: 'URL da imagem do produto',
