@@ -1,6 +1,7 @@
 import { applyDecorators } from "@nestjs/common";
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse } from "@nestjs/swagger";
-import { CreateProductSwaggerDto, LoginSwaggerDto, PaginatedProductsSwaggerDto, UpdateProductSwaggerDto } from "../../products/dto/product-example.dto";
+import { CreateProductSwaggerDto, GetCartSwaggerDtoResponse, PaginatedProductsSwaggerDto, UpdateProductSwaggerDto } from "../swagger-types/product-example-swagger.dto";
+import { LoginSwaggerDto, UserRegisterSwaggerDto } from "../swagger-types/auth-example-swagger.dto";
 
 // Decorators das rotas de produtos
 
@@ -19,7 +20,7 @@ export function ApiListOperation(resourceName: string) {
       ApiResponse ({ status : 400 , description: 'Paramétros inválidos'}),
   )
 }
-export function ApiCreateOperation(resourceName: string, bodyType?: any){
+export function ApiCreateOperation(resourceName: string){
   return applyDecorators(
     ApiOperation ({
       summary: `Criar ${resourceName}`,
@@ -60,7 +61,7 @@ export function ApiCreateOperation(resourceName: string, bodyType?: any){
     })
   )
 }
-export function ApiUpdateOperation(resourceName: string, bodyType?: any) {
+export function ApiUpdateOperation(resourceName: string) {
   return applyDecorators(
     ApiOperation ({
       summary: `Atualizar ${resourceName}`,
@@ -158,5 +159,39 @@ export function ApiLoginOperation(resourceName: string){
       status: 401,
       description: 'Credenciais inválidas'
     })
+  )
+}
+export function ApiUserRegisterOperation(resourceName : string){
+  return applyDecorators(
+    ApiOperation({
+      summary: `${resourceName} de usuário`,
+      description: 'Registrar usuário na aplicação'
+    }),
+    ApiBody({
+      type: UserRegisterSwaggerDto,
+      description: 'Dados para cadastro do usuário'
+    })
+  )
+}
+export function ApiGetCartOperation(resourceName: string){
+  return applyDecorators(
+    ApiOperation({
+      summary: `Listar itens do ${resourceName} `,
+      description: 'Listar todos os itens do carrinho de um cliente'
+    }),
+    ApiResponse({
+      status: 200,
+      type: GetCartSwaggerDtoResponse,
+      description: 'Itens retornados com sucesso'
+    }),
+    ApiResponse({
+      status: 401,
+      description: `Token JWT inválido ou expirado`
+    }),
+    ApiResponse({
+      status: 403,
+      description: `Acesso negado, apenas para administradores`
+    }),
+
   )
 }
