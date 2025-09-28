@@ -3,8 +3,12 @@ import {
   Controller,
   Delete,
   Get,
+  Param,
+  ParseIntPipe,
   Post,
+  Put,
   Req,
+  Request,
   UseGuards,
   UsePipes,
 } from '@nestjs/common';
@@ -51,5 +55,14 @@ export class CartController {
   @Delete('clear')
   async clearCart(@Req() req: any) {
     return this.cartService.clearCart(req.user.userId);
+  }
+  @Put('items/:productId')
+  async updateQuantity(
+    @Request() req,
+    @Param('productId', ParseIntPipe) productId: number,
+    @Body() updateCartDto: any
+  ) {
+    const userId = req.user.userId; 
+    return this.cartService.updateQuantity(userId, productId, updateCartDto.quantity);
   }
 }
