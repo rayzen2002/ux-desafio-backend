@@ -23,6 +23,7 @@ import {
 } from './dto/cart.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { RolesGuard } from '../auth/jwt.guard';
+import { ApiGetCartOperation } from '../common/decorators/api-decorators';
 
 
 @ApiTags('carrinho')
@@ -32,6 +33,7 @@ export class CartController {
   constructor(private readonly cartService: CartService) {}
 
   @Get()
+  @ApiGetCartOperation('carrinho')
   async getCart(@Req() req: any) {
     return this.cartService.getCart(req.user.userId);
   }

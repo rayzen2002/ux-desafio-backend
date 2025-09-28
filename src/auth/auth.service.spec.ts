@@ -6,11 +6,11 @@ import { EmailConfirmationService } from '../users/email-confirmation.service';
 
 // Mocks corretos
 jest.mock('bcrypt', () => ({
-  hash: jest.fn().mockResolvedValue('hashedPassword'), // ✅ Corrigido
+  hash: jest.fn().mockResolvedValue('hashedPassword'), 
 }));
 
 jest.mock('crypto', () => ({
-  randomBytes: jest.fn().mockReturnValue({ // ✅ Corrigido
+  randomBytes: jest.fn().mockReturnValue({ 
     toString: jest.fn().mockReturnValue('confirmToken123'),
   }),
 }));
@@ -70,7 +70,6 @@ describe('UsersService', () => {
         updated_at: new Date(),
       };
       
-      // ✅ Corrigido: passe o valor para mockResolvedValue
       (repository.findByEmail as jest.Mock).mockResolvedValue([user]);
 
       const result = await service.findByEmail('test@example.com');
@@ -78,7 +77,6 @@ describe('UsersService', () => {
     });
 
     it('should return null if user not found', async () => {
-      // ✅ Corrigido: passe o valor para mockResolvedValue
       (repository.findByEmail as jest.Mock).mockResolvedValue([]);
 
       const result = await service.findByEmail('test@example.com');
@@ -96,7 +94,6 @@ describe('UsersService', () => {
     };
 
     it('should create a new user if email is not already registered', async () => {
-      // ✅ Corrigido: passe os valores para mockResolvedValue
       (repository.findByEmail as jest.Mock).mockResolvedValue([]);
       
       (repository.create as jest.Mock).mockResolvedValue({
@@ -113,7 +110,6 @@ describe('UsersService', () => {
         updated_at: new Date(),
       });
 
-      // ✅ Corrigido: passe o valor para mockResolvedValue
       (emailConfirmationService.generateConfirmationToken as jest.Mock)
         .mockResolvedValue('confirmToken123');
 
@@ -136,7 +132,6 @@ describe('UsersService', () => {
     });
 
     it('should throw ConflictException if email is already registered', async () => {
-      // ✅ Corrigido: passe o valor para mockResolvedValue
       (repository.findByEmail as jest.Mock).mockResolvedValue([
         {
           id: '1',
@@ -165,14 +160,12 @@ describe('UsersService', () => {
         email: 'test@example.com'
       };
 
-      // ✅ Corrigido: passe os valores para mockResolvedValue
       (emailConfirmationService.verifyConfirmationToken as jest.Mock)
         .mockResolvedValue(mockVerificationResult);
       
       (emailConfirmationService.removeConfirmationToken as jest.Mock)
         .mockResolvedValue(undefined);
 
-      // ✅ Corrigido: passe o valor para mockResolvedValue
       (repository.findById as jest.Mock).mockResolvedValue({
         id: '1',
         name: 'Test User',
@@ -214,7 +207,6 @@ describe('UsersService', () => {
     });
 
     it('should throw UnauthorizedException with invalid token', async () => {
-      // ✅ Corrigido: passe o valor para mockResolvedValue
       (emailConfirmationService.verifyConfirmationToken as jest.Mock)
         .mockResolvedValue(null);
 
@@ -227,11 +219,9 @@ describe('UsersService', () => {
         email: 'test@example.com'
       };
 
-      // ✅ Corrigido: passe o valor para mockResolvedValue
       (emailConfirmationService.verifyConfirmationToken as jest.Mock)
         .mockResolvedValue(mockVerificationResult);
 
-      // ✅ Corrigido: passe o valor para mockResolvedValue
       (repository.findById as jest.Mock).mockResolvedValue({
         id: '1',
         name: 'Test User',
@@ -272,7 +262,6 @@ describe('UsersService', () => {
         updated_at: new Date(),
       };
 
-      // ✅ Corrigido: passe os valores para mockResolvedValue
       (repository.findById as jest.Mock).mockResolvedValue(existingUser);
       (repository.findByEmail as jest.Mock).mockResolvedValue([]);
       (repository.updateUser as jest.Mock).mockResolvedValue({
