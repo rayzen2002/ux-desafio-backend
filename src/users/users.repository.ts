@@ -48,4 +48,32 @@ export class UsersRepository {
     if (!user) throw new Error('Token inválido ou expirado');
     return user;
   }
+  async findById(userId : string){
+    const user =  await db.select().from(users).where(eq(users.id, userId)).limit(1)
+    return user[0]
+  }
+ async updateUser(id: string, updatedData: Partial<User>) { 
+  const [updatedUser] = await db
+    .update(users)
+    .set({
+      ...updatedData,
+      updated_at: new Date()
+    })
+    .where(eq(users.id, id))
+    .returning()
+
+  return updatedUser
+}
+async updateUserWithRole(id: string, updatedData: Partial<User>, updatedBy: string) {
+  const [updatedUser] = await db
+    .update(users)
+    .set({
+      ...updatedData,
+      updated_at: new Date(),
+    })
+    .where(eq(users.id, id))
+    .returning()
+
+  return updatedUser
+}
 }

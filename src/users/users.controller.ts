@@ -18,7 +18,7 @@ export class UsersController {
 
   @Get('confirm')
   async confirm(@Query('token') token: string) {
-    const user = await this.usersService.activateUser(token);
-    return { message: `Usuário ${user.email} ativado com sucesso!` };
+    await this.usersService.activateUser(token)
+    return { message: `Usuário ativado com sucesso!` };
   }
 }
