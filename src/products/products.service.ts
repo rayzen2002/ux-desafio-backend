@@ -50,4 +50,11 @@ export class ProductsService {
     await this.productsRepo.remove(id);
     return { message: 'Produto removido com sucesso' };
   }
+  async findProductById(id: number){
+    const product = await this.productsRepo.findById(id)
+    if(!product){
+      return null
+    }
+    return product
+  }
 }

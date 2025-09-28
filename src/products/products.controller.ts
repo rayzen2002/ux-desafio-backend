@@ -23,8 +23,8 @@ import {
 } from './dto/create-products.dto';
 import { RolesGuard } from '../auth/jwt.guard';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import {  ApiOperation,  ApiResponse, ApiTags } from '@nestjs/swagger';
-import { ApiCreateOperation, ApiDeleteOperation, ApiListOperation, ApiUpdateOperation } from '../common/decorators/api-decorators';
+import { ApiTags } from '@nestjs/swagger';
+import { ApiCreateProductOperation, ApiDeleteProductOperation, ApiListProductOperation, ApiUpdateProductOperation } from '../common/decorators/api-decorators';
 
 @ApiTags('produtos')
 @Controller('products')
@@ -33,7 +33,7 @@ export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Get()
-  @ApiListOperation('produtos')
+  @ApiListProductOperation('produtos')
   @UsePipes(new ZodValidationPipe(PaginationSchema))
   async list(@Query() query: PaginationDto) {
     return this.productsService.listProducts(
@@ -45,7 +45,7 @@ export class ProductsController {
 
   @UseGuards(JwtAuthGuard, new RolesGuard(['admin']))
   @Post()
-  @ApiCreateOperation('produtos')
+  @ApiCreateProductOperation('produtos')
   @UsePipes(new ZodValidationPipe(CreateProductSchema))
   async create(@Body() dto: CreateProductDto, @Req() req: any) {
     const role = req.user?.role ?? 'user';
@@ -53,7 +53,7 @@ export class ProductsController {
   }
 
   @Put(':id')
-  @ApiUpdateOperation('produto')
+  @ApiUpdateProductOperation('produto')
   @UsePipes(new ZodValidationPipe(UpdateProductSchema))
   @UseGuards(JwtAuthGuard, new RolesGuard(['admin']))
   async update(
@@ -66,7 +66,7 @@ export class ProductsController {
   }
 
   @Delete(':id')
-  @ApiDeleteOperation('produto')
+  @ApiDeleteProductOperation('produto')
   @UseGuards(JwtAuthGuard, new RolesGuard(['admin']))
   async remove(@Param('id') id: string, @Req() req: any) {
     const role = req.user?.role ?? 'user';
