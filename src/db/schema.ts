@@ -9,7 +9,7 @@ export const users = pgTable('users', {
   name: varchar('name', { length: 255 }).notNull(),
   email: varchar('email', { length: 255 }).notNull().unique(),
   password: varchar('password', { length: 255 }).notNull(), // hashed
-  role: userRoleEnum(),
+  role: userRoleEnum().notNull(),
   phone: varchar('phone', { length: 20 }),
   cpf: varchar('cpf', { length: 14 }).unique(),
   is_active: boolean('is_active').notNull().default(false),
