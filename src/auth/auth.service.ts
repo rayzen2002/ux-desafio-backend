@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
-import type { users } from '../db/schema';
+import type { users } from '../../infra/db/schema';
 import type { InferSelectModel } from 'drizzle-orm';
 export type User = InferSelectModel<typeof users>;
 @Injectable()

@@ -5,7 +5,7 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import type { InferSelectModel } from 'drizzle-orm';
-import type { users } from 'src/db/schema';
+import type { users } from 'infra/db/schema';
 
 export type User = InferSelectModel<typeof users>;
 @Injectable()

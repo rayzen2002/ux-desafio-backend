@@ -1,9 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { eq, ilike, sql, type InferSelectModel } from 'drizzle-orm';
-import { db } from '../db';
-import { products } from '../db/schema';
+import { db } from '../../infra/db';
+import { products } from '../../infra/db/schema';
 import type { CreateProductDto } from './dto/create-products.dto';
-import { RedisHelper } from '../redis/utils/redis-helpers';
+import { RedisHelper } from '../../infra/redis/utils/redis-helpers';
 
 export type Product = InferSelectModel<typeof products>;
 

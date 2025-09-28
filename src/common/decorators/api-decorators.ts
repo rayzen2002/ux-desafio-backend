@@ -2,6 +2,8 @@ import { applyDecorators } from "@nestjs/common";
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse } from "@nestjs/swagger";
 import { CreateProductSwaggerDto, PaginatedProductsSwaggerDto, UpdateProductSwaggerDto } from "../../products/dto/product-example.dto";
 
+// Decorators das rotas de produtos
+
 export function ApiListOperation(resourceName: string) {
   return applyDecorators(
     ApiOperation({
