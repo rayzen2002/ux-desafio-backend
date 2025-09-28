@@ -17,9 +17,13 @@ import {
   type AddToCartDto,
   type RemoveFromCartDto,
 } from './dto/cart.dto';
+import { ApiTags } from '@nestjs/swagger';
+import { RolesGuard } from '../auth/jwt.guard';
 
+
+@ApiTags('carrinho')
 @Controller('cart')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, new RolesGuard(['user','admin']))
 export class CartController {
   constructor(private readonly cartService: CartService) {}
 

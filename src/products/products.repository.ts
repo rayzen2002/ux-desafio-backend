@@ -11,40 +11,67 @@ export type Product = InferSelectModel<typeof products>;
 export class ProductsRepository {
   constructor(private readonly redisHelper: RedisHelper) {}
   async findAll(
-    page = 1,
-    limit = 10,
-    name?: string,
-  ): Promise<{ data: Product[]; total: number }> {
-    const cacheKey = `products:all:page=${page}:limit=${limit}:name=${name ?? 'all'}`;
-    const cached = await this.redisHelper.get<{
-      data: Product[];
-      total: number;
-    }>(cacheKey);
+  page = 1,
+  limit = 10,
+  name?: string,
+): Promise<{ 
+  data: Product[]; 
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+  hasNext: boolean;
+  hasPrev: boolean;
+}> {
+  const cacheKey = `products:all:page=${page}:limit=${limit}:name=${name ?? 'all'}`;
+  const cached = await this.redisHelper.get<{
+    data: Product[];
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+  }>(cacheKey);
 
-    if (cached) {
-      console.log('retorno cacheado do redis');
-      return cached;
-    }
-
-    const offset = (page - 1) * limit;
-    const where = name ? ilike(products.name, `%${name}%`) : undefined;
-
-    const data = await db
-      .select()
-      .from(products)
-      .where(where)
-      .limit(limit)
-      .offset(offset);
-
-    const [{ count }] = await db
-      .select({ count: sql<number>`count(*)` })
-      .from(products)
-      .where(where);
-
-    const result = { data, total: Number(count) };
-    await this.redisHelper.set(cacheKey, result, 60);
-    return result;
+  if (cached) {
+    console.log('retorno cacheado do redis');
+    return cached;
   }
+
+  const offset = (page - 1) * limit;
+  const where = name ? ilike(products.name, `%${name}%`) : undefined;
+
+  const data = await db
+    .select()
+    .from(products)
+    .where(where)
+    .limit(limit)
+    .offset(offset);
+
+  const [{ count }] = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(products)
+    .where(where);
+
+  const total = Number(count);
+  const totalPages = Math.ceil(total / limit);
+  const hasNext = page < totalPages;
+  const hasPrev = page > 1;
+
+  const result = { 
+    data, 
+    total,
+    page,
+    limit,
+    totalPages,
+    hasNext,
+    hasPrev
+  };
+  
+  await this.redisHelper.set(cacheKey, result, 60);
+  return result;
+}
 
   async findById(id: number) {
     const cacheKey = `products:${id}`;

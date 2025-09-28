@@ -23,11 +23,17 @@ import {
 } from './dto/create-products.dto';
 import { RolesGuard } from '../auth/jwt.guard';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import {  ApiOperation,  ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiCreateOperation, ApiDeleteOperation, ApiListOperation, ApiUpdateOperation } from '../common/decorators/api-decorators';
+
+@ApiTags('produtos')
 @Controller('products')
+@UseGuards(JwtAuthGuard, new RolesGuard(['user','admin']))
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Get()
+  @ApiListOperation('produtos')
   @UsePipes(new ZodValidationPipe(PaginationSchema))
   async list(@Query() query: PaginationDto) {
     return this.productsService.listProducts(
@@ -39,6 +45,10 @@ export class ProductsController {
 
   @UseGuards(JwtAuthGuard, new RolesGuard(['admin']))
   @Post()
+  @ApiCreateOperation('produtos')
+  @ApiOperation({ summary: 'Criar novo produto' })
+  @ApiResponse({ status: 201, description: 'Produto criado com sucesso' })
+  @ApiResponse({ status: 403, description: 'Acesso negado' })
   @UsePipes(new ZodValidationPipe(CreateProductSchema))
   async create(@Body() dto: CreateProductDto, @Req() req: any) {
     const role = req.user?.role ?? 'user';
@@ -46,7 +56,9 @@ export class ProductsController {
   }
 
   @Put(':id')
+  @ApiUpdateOperation('produto')
   @UsePipes(new ZodValidationPipe(UpdateProductSchema))
+  @UseGuards(JwtAuthGuard, new RolesGuard(['admin']))
   async update(
     @Param('id') id: string,
     @Body() dto: UpdateProductDto,
@@ -57,6 +69,8 @@ export class ProductsController {
   }
 
   @Delete(':id')
+  @ApiDeleteOperation('produto')
+  @UseGuards(JwtAuthGuard, new RolesGuard(['admin']))
   async remove(@Param('id') id: string, @Req() req: any) {
     const role = req.user?.role ?? 'user';
     return this.productsService.removeProduct(Number(id), role);

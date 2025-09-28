@@ -3,13 +3,21 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { ProductsRepository } from './products.repository';
+import { ProductsRepository, type Product } from './products.repository';
 
 @Injectable()
 export class ProductsService {
   constructor(private readonly productsRepo: ProductsRepository) {}
 
-  async listProducts(page: number, limit: number, name?: string) {
+  async listProducts(page: number, limit: number, name?: string) : Promise<{
+  data: Product[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+  hasNext: boolean;
+  hasPrev: boolean;
+}> {
     return this.productsRepo.findAll(page, limit, name);
   }
 
