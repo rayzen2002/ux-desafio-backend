@@ -191,3 +191,16 @@ export class PaginationSwaggerDto {
   name?: string;
 }
 
+export class LoginSwaggerDto{
+  @ApiProperty({
+    example: 'exemplo@email.com',
+    description: 'Email do usuário'
+  })
+  email: string
+  @ApiProperty({
+    example: 'secretpassword',
+    description: 'Senha do usuário'
+  })
+  password: string
+}
+

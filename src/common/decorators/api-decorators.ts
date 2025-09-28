@@ -1,6 +1,6 @@
 import { applyDecorators } from "@nestjs/common";
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse } from "@nestjs/swagger";
-import { CreateProductSwaggerDto, PaginatedProductsSwaggerDto, UpdateProductSwaggerDto } from "../../products/dto/product-example.dto";
+import { CreateProductSwaggerDto, LoginSwaggerDto, PaginatedProductsSwaggerDto, UpdateProductSwaggerDto } from "../../products/dto/product-example.dto";
 
 // Decorators das rotas de produtos
 
@@ -137,6 +137,26 @@ export function ApiDeleteOperation(resourceName: string) {
     ApiResponse({
       status: 400,
       description: `Dados inválidos`
+    })
+  )
+}
+export function ApiLoginOperation(resourceName: string){
+  return applyDecorators(
+    ApiOperation({
+      summary: `Fazer ${resourceName}`,
+      description: 'Logar na aplicação com um usuário válido',
+    }),
+    ApiBody({
+      type: LoginSwaggerDto,
+      description: `Dados do ${resourceName}`
+    }),
+    ApiResponse({
+      status: 200,
+      description: 'Login realizado'
+    }),
+    ApiResponse({
+      status: 401,
+      description: 'Credenciais inválidas'
     })
   )
 }
