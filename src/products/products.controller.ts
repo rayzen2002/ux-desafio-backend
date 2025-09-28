@@ -46,9 +46,6 @@ export class ProductsController {
   @UseGuards(JwtAuthGuard, new RolesGuard(['admin']))
   @Post()
   @ApiCreateOperation('produtos')
-  @ApiOperation({ summary: 'Criar novo produto' })
-  @ApiResponse({ status: 201, description: 'Produto criado com sucesso' })
-  @ApiResponse({ status: 403, description: 'Acesso negado' })
   @UsePipes(new ZodValidationPipe(CreateProductSchema))
   async create(@Body() dto: CreateProductDto, @Req() req: any) {
     const role = req.user?.role ?? 'user';

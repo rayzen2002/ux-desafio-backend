@@ -1,38 +1,18 @@
 import { applyDecorators } from "@nestjs/common";
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse } from "@nestjs/swagger";
-import { CreateProductSwaggerDto } from "../../products/dto/product-example.dto";
+import { CreateProductSwaggerDto, PaginatedProductsSwaggerDto } from "../../products/dto/product-example.dto";
 
 export function ApiListOperation(resourceName: string) {
   return applyDecorators(
     ApiOperation({
       summary: `Listar ${resourceName}`,
-      description: `Retorna lista paginada de ${resourceName}`
+      description: `Retorna lista paginada/filtrada de ${resourceName}`
       }),
       ApiQuery ({ name: 'page', example: '1', required: false}), 
       ApiQuery ({ name: 'limit', example: '10', required: false}), 
       ApiQuery ({ name: 'name', example: 'notebook', required: false}), 
       ApiResponse ({ status : 200 , description: 'Lista retornada com sucesso',
-        schema: {
-          example: {
-            data: [
-            {
-              id: 1,
-              name: "Notebook Dell",
-              price: "3500.00",
-              category: "eletronicos",
-              imageUrl: "http://exemplo.com/notebook.jpg",
-              createdAt: "2024-01-01T00:00:00.000Z",
-              updatedAt: "2024-01-01T00:00:00.000Z"
-            }
-          ],
-          total: 150,
-          page: 1,
-          limit: 10,
-          totalPages: 15,
-          hasNext: true,
-          hasPrev: false
-          }
-        }
+        type: PaginatedProductsSwaggerDto
       }),
       ApiResponse ({ status : 400 , description: 'Paramétros inválidos'}),
   )
