@@ -239,3 +239,54 @@ export class GetCartSwaggerDtoResponse {
  })
  itemsCount: number
 }
+
+export class CreateCartSwaggerDtoBody{
+  @ApiProperty({
+    example: 1,
+    description: "Id do produto a ser adicionado"
+  })
+  productId: number
+  @ApiProperty({
+    example: 2,
+    description: 'Quantidade de itens a ser adicionados'
+  })
+  quantity: number
+}
+
+export class CreateCartSwaggerDtoResponse {
+  @ApiProperty({
+    example: 10,
+    description: 'ID único do item no carrinho'
+  })
+  id: number;
+
+  @ApiProperty({
+    example: '368ce346-e0d7-45fb-bd46-6d9cc25e0049',
+    description: 'ID do carrinho ao qual o item pertence'
+  })
+  cartId: string;
+
+  @ApiProperty({
+    example: 4,
+    description: 'ID do produto'
+  })
+  productId: number;
+
+  @ApiProperty({
+    example: 2,
+    description: 'Quantidade do produto no carrinho'
+  })
+  quantity: number;
+
+  @ApiProperty({
+    example: '2025-09-28T19:28:03.225Z',
+    description: 'Data de criação do item no carrinho'
+  })
+  createdAt: Date;
+
+  @ApiProperty({
+    example: '2025-09-28T19:28:03.225Z',
+    description: 'Data da última atualização do item no carrinho'
+  })
+  updatedAt: Date;
+}

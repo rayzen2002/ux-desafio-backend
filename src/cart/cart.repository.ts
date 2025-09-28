@@ -1,12 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { and, eq, type InferSelectModel } from 'drizzle-orm';
 import { db } from '../../infra/db';
 import { cartItems, carts, products } from '../../infra/db/schema';
+import  { ProductsService } from '../products/products.service';
 
 export type Carts = InferSelectModel<typeof carts>;
 
 @Injectable()
 export class CartRepository {
+  constructor(private readonly productsSerivce : ProductsService){}
  
   async createCart(userId: string) {
     const [cart] = await db.insert(carts).values({ userId }).returning();
@@ -38,6 +40,10 @@ export class CartRepository {
   }
 
   async addProduct(cartId: string, productId: number, quantity: number = 1) {
+    const product = await this.productsSerivce.findProductById(productId);
+    if(!product){
+      throw new NotFoundException()
+    }
     const [existing] = await db
       .select()
       .from(cartItems)
@@ -59,7 +65,7 @@ export class CartRepository {
       .insert(cartItems)
       .values({ cartId, productId, quantity })
       .returning();
-
+    
     return item;
   }
 

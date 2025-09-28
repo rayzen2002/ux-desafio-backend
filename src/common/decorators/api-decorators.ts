@@ -1,11 +1,11 @@
 import { applyDecorators } from "@nestjs/common";
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse } from "@nestjs/swagger";
-import { CreateProductSwaggerDto, GetCartSwaggerDtoResponse, PaginatedProductsSwaggerDto, UpdateProductSwaggerDto } from "../swagger-types/product-example-swagger.dto";
+import { CreateCartSwaggerDtoBody, CreateCartSwaggerDtoResponse, CreateProductSwaggerDto, GetCartSwaggerDtoResponse, PaginatedProductsSwaggerDto, UpdateProductSwaggerDto } from "../swagger-types/product-example-swagger.dto";
 import { LoginSwaggerDto, UserRegisterSwaggerDto } from "../swagger-types/auth-example-swagger.dto";
 
 // Decorators das rotas de produtos
 
-export function ApiListOperation(resourceName: string) {
+export function ApiListProductOperation(resourceName: string) {
   return applyDecorators(
     ApiOperation({
       summary: `Listar ${resourceName}`,
@@ -20,7 +20,7 @@ export function ApiListOperation(resourceName: string) {
       ApiResponse ({ status : 400 , description: 'Paramétros inválidos'}),
   )
 }
-export function ApiCreateOperation(resourceName: string){
+export function ApiCreateProductOperation(resourceName: string){
   return applyDecorators(
     ApiOperation ({
       summary: `Criar ${resourceName}`,
@@ -61,7 +61,7 @@ export function ApiCreateOperation(resourceName: string){
     })
   )
 }
-export function ApiUpdateOperation(resourceName: string) {
+export function ApiUpdateProductOperation(resourceName: string) {
   return applyDecorators(
     ApiOperation ({
       summary: `Atualizar ${resourceName}`,
@@ -109,7 +109,7 @@ export function ApiUpdateOperation(resourceName: string) {
     })
   )
 }
-export function ApiDeleteOperation(resourceName: string) {
+export function ApiDeleteProductOperation(resourceName: string) {
   return applyDecorators(
     ApiOperation ({
       summary: `Deletar ${resourceName}`,
@@ -179,6 +179,7 @@ export function ApiGetCartOperation(resourceName: string){
       summary: `Listar itens do ${resourceName} `,
       description: 'Listar todos os itens do carrinho de um cliente'
     }),
+    ApiBearerAuth('JWT-auth'),
     ApiResponse({
       status: 200,
       type: GetCartSwaggerDtoResponse,
@@ -193,5 +194,39 @@ export function ApiGetCartOperation(resourceName: string){
       description: `Acesso negado, apenas para administradores`
     }),
 
+  )
+}
+export function ApiCreateCartOperation(resourceName: string){
+  return applyDecorators(
+    ApiOperation({
+      summary: `Adicionar produto no ${resourceName}`,
+      description: "Adiciona um produto ao carrinho"
+    }),
+    ApiBearerAuth('JWT-auth'),
+    ApiBody({
+      type: CreateCartSwaggerDtoBody,
+      description: 'Dados do produto a ser adicionado no carrinho'
+    }),
+    ApiResponse({
+      status: 201,
+      description: 'Item adicionado com sucesso',
+      type: CreateCartSwaggerDtoResponse,
+      example: {
+          "id": 10,
+          "cartId": "368ce346-e0d7-45fb-bd46-6d9cc25e0049",
+          "productId": 4,
+          "quantity": 2,
+          "createdAt": "2025-09-28T19:28:03.225Z",
+          "updatedAt": "2025-09-28T19:28:03.225Z"
+        }
+    }),
+    ApiResponse({
+      status: 404,
+      description: `Produto não encontrado`
+    }),
+     ApiResponse({
+      status: 401,
+      description: `Token JWT inválido ou expirado`
+    }),
   )
 }

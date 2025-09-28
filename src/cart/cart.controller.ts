@@ -23,7 +23,7 @@ import {
 } from './dto/cart.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { RolesGuard } from '../auth/jwt.guard';
-import { ApiGetCartOperation } from '../common/decorators/api-decorators';
+import { ApiCreateCartOperation, ApiGetCartOperation } from '../common/decorators/api-decorators';
 
 
 @ApiTags('carrinho')
@@ -39,6 +39,7 @@ export class CartController {
   }
 
   @Post('add')
+  @ApiCreateCartOperation('carrinho')
   @UsePipes(new ZodValidationPipe(AddToCartSchema))
   async addToCart(@Req() req: any, @Body() dto: AddToCartDto) {
     return this.cartService.addToCart(
