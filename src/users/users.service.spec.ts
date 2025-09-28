@@ -1,22 +1,24 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from './users.service';
 import { UsersRepository } from './users.repository';
-import { ConflictException } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
-import { randomBytes } from 'crypto';
+import { EmailConfirmationService } from './email-confirmation.service';
+import { ConflictException, UnauthorizedException, NotFoundException } from '@nestjs/common';
 
+// Mocks
 jest.mock('bcrypt', () => ({
-  hash: jest.fn((password, salt) => 'hashedPassword'),
+  hash: jest.fn().mockResolvedValue('hashedPassword'),
 }));
+
 jest.mock('crypto', () => ({
-  randomBytes: jest.fn((size) => ({
-    toString: jest.fn(() => 'confirmToken'),
-  })),
+  randomBytes: jest.fn().mockReturnValue({
+    toString: jest.fn().mockReturnValue('confirmToken123'),
+  }),
 }));
 
 describe('UsersService', () => {
   let service: UsersService;
   let repository: UsersRepository;
+  let emailConfirmationService: EmailConfirmationService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -27,7 +29,17 @@ describe('UsersService', () => {
           useValue: {
             findByEmail: jest.fn(),
             create: jest.fn(),
+            updateUser: jest.fn(),
+            findById: jest.fn(),
             activateUser: jest.fn(),
+          },
+        },
+        {
+          provide: EmailConfirmationService,
+          useValue: {
+            generateConfirmationToken: jest.fn(),
+            verifyConfirmationToken: jest.fn(),
+            removeConfirmationToken: jest.fn(),
           },
         },
       ],
@@ -35,6 +47,7 @@ describe('UsersService', () => {
 
     service = module.get<UsersService>(UsersService);
     repository = module.get<UsersRepository>(UsersRepository);
+    emailConfirmationService = module.get<EmailConfirmationService>(EmailConfirmationService);
   });
 
   it('should be defined', () => {
@@ -56,15 +69,18 @@ describe('UsersService', () => {
         created_at: new Date(),
         updated_at: new Date(),
       };
-      jest.spyOn(repository, 'findByEmail').mockResolvedValue([user]);
+      
+      (repository.findByEmail as jest.Mock).mockResolvedValue([user]);
 
-      expect(await service.findByEmail('test@example.com')).toEqual(user);
+      const result = await service.findByEmail('test@example.com');
+      expect(result).toEqual(user);
     });
 
     it('should return null if user not found', async () => {
-      jest.spyOn(repository, 'findByEmail').mockResolvedValue([]);
+      (repository.findByEmail as jest.Mock).mockResolvedValue([]);
 
-      expect(await service.findByEmail('test@example.com')).toBeNull();
+      const result = await service.findByEmail('test@example.com');
+      expect(result).toBeNull();
     });
   });
 
@@ -78,8 +94,9 @@ describe('UsersService', () => {
     };
 
     it('should create a new user if email is not already registered', async () => {
-      jest.spyOn(repository, 'findByEmail').mockResolvedValue([]);
-      jest.spyOn(repository, 'create').mockResolvedValue({
+      (repository.findByEmail as jest.Mock).mockResolvedValue([]);
+      
+      (repository.create as jest.Mock).mockResolvedValue({
         id: '1',
         name: userData.name,
         email: userData.email,
@@ -88,27 +105,34 @@ describe('UsersService', () => {
         phone: userData.phone || null,
         cpf: userData.cpf,
         is_active: false,
-        confirm_token: 'confirmToken',
+        confirm_token: 'confirmToken123',
         created_at: new Date(),
         updated_at: new Date(),
       });
 
+      (emailConfirmationService.generateConfirmationToken as jest.Mock)
+        .mockResolvedValue('confirmToken123');
+
       const result = await service.CreateUser(userData);
+      
       expect(result).toEqual({
         id: '1',
         email: userData.email,
-        confirm_token: 'confirmToken',
       });
+      
       expect(repository.create).toHaveBeenCalledWith({
         ...userData,
         password: 'hashedPassword',
         is_active: false,
-        confirm_token: 'confirmToken',
+        confirm_token: 'confirmToken123',
       });
+      
+      expect(emailConfirmationService.generateConfirmationToken)
+        .toHaveBeenCalledWith('1', userData.email, 'confirmToken123');
     });
 
     it('should throw ConflictException if email is already registered', async () => {
-      jest.spyOn(repository, 'findByEmail').mockResolvedValue([
+      (repository.findByEmail as jest.Mock).mockResolvedValue([
         {
           id: '1',
           name: userData.name,
@@ -124,18 +148,39 @@ describe('UsersService', () => {
         },
       ]);
 
-      await expect(service.CreateUser(userData)).rejects.toThrow(
-        ConflictException,
-      );
-      await expect(service.CreateUser(userData)).rejects.toThrow(
-        'Email já cadastrado',
-      );
+      await expect(service.CreateUser(userData)).rejects.toThrow(ConflictException);
+      await expect(service.CreateUser(userData)).rejects.toThrow('Email já cadastrado');
     });
   });
 
   describe('activateUser', () => {
     it('should activate a user with a valid token', async () => {
-      const activatedUser = {
+      const mockVerificationResult = {
+        userId: '1',
+        email: 'test@example.com'
+      };
+
+      (emailConfirmationService.verifyConfirmationToken as jest.Mock)
+        .mockResolvedValue(mockVerificationResult);
+      
+      (emailConfirmationService.removeConfirmationToken as jest.Mock)
+        .mockResolvedValue(undefined);
+
+      (repository.findById as jest.Mock).mockResolvedValue({
+        id: '1',
+        name: 'Test User',
+        email: 'test@example.com',
+        password: 'hashedPassword',
+        role: 'user' as const,
+        phone: null,
+        cpf: '12345678900',
+        is_active: false,
+        confirm_token: 'confirmToken123',
+        created_at: new Date(),
+        updated_at: new Date(),
+      });
+
+      (repository.updateUser as jest.Mock).mockResolvedValue({
         id: '1',
         name: 'Test User',
         email: 'test@example.com',
@@ -147,10 +192,102 @@ describe('UsersService', () => {
         confirm_token: null,
         created_at: new Date(),
         updated_at: new Date(),
-      };
-      jest.spyOn(repository, 'activateUser').mockResolvedValue(activatedUser);
+      });
 
-      expect(await service.activateUser('validToken')).toEqual(activatedUser);
+      await service.activateUser('validToken');
+
+      expect(emailConfirmationService.verifyConfirmationToken)
+        .toHaveBeenCalledWith('validToken');
+      expect(repository.updateUser).toHaveBeenCalledWith('1', {
+        is_active: true,
+        confirm_token: null
+      });
+      expect(emailConfirmationService.removeConfirmationToken)
+        .toHaveBeenCalledWith('validToken');
+    });
+
+    it('should throw UnauthorizedException with invalid token', async () => {
+      (emailConfirmationService.verifyConfirmationToken as jest.Mock)
+        .mockResolvedValue(null);
+
+      await expect(service.activateUser('invalidToken')).rejects.toThrow(UnauthorizedException);
+    });
+
+    it('should throw ConflictException if user is already active', async () => {
+      const mockVerificationResult = {
+        userId: '1',
+        email: 'test@example.com'
+      };
+
+      (emailConfirmationService.verifyConfirmationToken as jest.Mock)
+        .mockResolvedValue(mockVerificationResult);
+
+      (repository.findById as jest.Mock).mockResolvedValue({
+        id: '1',
+        name: 'Test User',
+        email: 'test@example.com',
+        password: 'hashedPassword',
+        role: 'user' as const,
+        phone: null,
+        cpf: '12345678900',
+        is_active: true,
+        confirm_token: null,
+        created_at: new Date(),
+        updated_at: new Date(),
+      });
+
+      await expect(service.activateUser('validToken')).rejects.toThrow(ConflictException);
+    });
+
+    it('should throw NotFoundException if user not found', async () => {
+      const mockVerificationResult = {
+        userId: '1',
+        email: 'test@example.com'
+      };
+
+      (emailConfirmationService.verifyConfirmationToken as jest.Mock)
+        .mockResolvedValue(mockVerificationResult);
+
+      (repository.findById as jest.Mock).mockResolvedValue(null);
+
+      await expect(service.activateUser('validToken')).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  describe('updateUser', () => {
+    it('should update user successfully', async () => {
+      const userId = '1';
+      const updateData = {
+        name: 'Updated Name',
+        phone: '123456789',
+      };
+
+      const existingUser = {
+        id: userId,
+        name: 'Test User',
+        email: 'test@example.com',
+        password: 'hashedPassword',
+        role: 'user' as const,
+        phone: null,
+        cpf: '12345678900',
+        is_active: true,
+        confirm_token: null,
+        created_at: new Date(),
+        updated_at: new Date(),
+      };
+
+      (repository.findById as jest.Mock).mockResolvedValue(existingUser);
+      (repository.findByEmail as jest.Mock).mockResolvedValue([]);
+      (repository.updateUser as jest.Mock).mockResolvedValue({
+        ...existingUser,
+        ...updateData,
+        updated_at: new Date(),
+      });
+
+      const result = await service.updateUser(userId, updateData, 'user');
+
+      expect(result.name).toBe('Updated Name');
+      expect(result.phone).toBe('123456789');
     });
   });
 });

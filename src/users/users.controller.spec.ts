@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
+import { UnauthorizedException, ConflictException } from '@nestjs/common';
 
 describe('UsersController', () => {
   let controller: UsersController;
@@ -29,57 +30,72 @@ describe('UsersController', () => {
   });
 
   describe('register', () => {
-    it('should register a user', async () => {
+    it('should register a user successfully', async () => {
       const registerDto = {
         name: 'Test User',
         email: 'test@example.com',
         password: 'password123',
         cpf: '12345678900',
       };
-      const createdUser = {
+      
+      const expectedResponse = {
         id: '1',
-        name: 'Test User',
         email: 'test@example.com',
-        password: 'hashedPassword',
-        role: 'user',
-        phone: null,
-        cpf: '12345678900',
-        is_active: false,
-        confirm_token: 'token',
-        created_at: new Date(),
-        updated_at: new Date(),
       };
-      jest.spyOn(service, 'CreateUser').mockResolvedValue(createdUser);
+      
+      (service.CreateUser as jest.Mock).mockResolvedValue(expectedResponse);
 
       const result = await controller.register(registerDto);
-      expect(result).toEqual(createdUser);
+      
+      expect(result).toEqual(expectedResponse);
       expect(service.CreateUser).toHaveBeenCalledWith(registerDto);
+    });
+
+    it('should handle registration errors', async () => {
+      const registerDto = {
+        name: 'Test User',
+        email: 'test@example.com',
+        password: 'password123',
+        cpf: '12345678900',
+      };
+      
+      const error = new ConflictException('Email já cadastrado');
+      (service.CreateUser as jest.Mock).mockRejectedValue(error);
+
+      await expect(controller.register(registerDto)).rejects.toThrow(ConflictException);
     });
   });
 
   describe('confirm', () => {
-    it('should confirm user activation', async () => {
+    it('should confirm user activation successfully', async () => {
       const token = 'validToken';
-      const activatedUser = {
-        id: '1',
-        name: 'Test User',
-        email: 'test@example.com',
-        password: 'hashedPassword',
-        role: 'user' as const,
-        phone: null,
-        cpf: '12345678900',
-        is_active: true,
-        confirm_token: null,
-        created_at: new Date(),
-        updated_at: new Date(),
-      };
-      jest.spyOn(service, 'activateUser').mockResolvedValue(activatedUser);
+      
+      (service.activateUser as jest.Mock).mockResolvedValue(undefined);
 
       const result = await controller.confirm(token);
+      
       expect(result).toEqual({
-        message: `Usuário ${activatedUser.email} ativado com sucesso!`,
+        message: 'Usuário ativado com sucesso!',
       });
       expect(service.activateUser).toHaveBeenCalledWith(token);
+    });
+
+    it('should handle invalid token', async () => {
+      const token = 'invalidToken';
+      
+      const error = new UnauthorizedException('Token inválido ou expirado');
+      (service.activateUser as jest.Mock).mockRejectedValue(error);
+
+      await expect(controller.confirm(token)).rejects.toThrow(UnauthorizedException);
+    });
+
+    it('should handle already active user', async () => {
+      const token = 'alreadyActiveToken';
+      
+      const error = new ConflictException('Usuário já está ativo');
+      (service.activateUser as jest.Mock).mockRejectedValue(error);
+
+      await expect(controller.confirm(token)).rejects.toThrow(ConflictException);
     });
   });
 });
