@@ -23,7 +23,7 @@ import {
 } from './dto/cart.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { RolesGuard } from '../auth/jwt.guard';
-import { ApiCreateCartOperation, ApiGetCartOperation } from '../common/decorators/api-decorators';
+import { ApiCreateCartOperation, ApiDeleteCartItemOperation, ApiDeleteCartOperation, ApiGetCartOperation, ApiUpdateQuantityInCartOperation } from '../common/decorators/api-decorators';
 
 
 @ApiTags('carrinho')
@@ -50,16 +50,19 @@ export class CartController {
   }
 
   @Delete('remove')
+  @ApiDeleteCartItemOperation('carrinho')
   @UsePipes(new ZodValidationPipe(RemoveFromCartSchema))
   async removeFromCart(@Req() req: any, @Body() dto: RemoveFromCartDto) {
     return this.cartService.removeFromCart(req.user.userId, dto.productId);
   }
 
   @Delete('clear')
+  @ApiDeleteCartOperation('carrinho')
   async clearCart(@Req() req: any) {
     return this.cartService.clearCart(req.user.userId);
   }
   @Put('items/:productId')
+  @ApiUpdateQuantityInCartOperation('carrinho')
   async updateQuantity(
     @Request() req,
     @Param('productId', ParseIntPipe) productId: number,

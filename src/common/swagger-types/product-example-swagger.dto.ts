@@ -290,3 +290,67 @@ export class CreateCartSwaggerDtoResponse {
   })
   updatedAt: Date;
 }
+export class DeleteCartItemSwaggerDtoBody{
+  @ApiProperty({
+    example: 2,
+    description: 'Id do produto a ser deletado do carrinho'
+  })
+  productId: number
+}
+
+export class UpdateCartItemSwaggerDtoBody{
+  @ApiProperty({
+    example: 2,
+    description: 'Quantidade do produto a ser atualizado do carrinho'
+  })
+  quantity: number
+}
+export class UpdateCartItemSwaggerDtoResponse {
+  @ApiProperty({
+    example: '368df346-e0d7-45fb-bd46-6d9cc25e0049',
+    description: 'Id do Carrinho',
+  })
+  id: string;
+
+  @ApiProperty({
+    example: '397ce346-e0d7-45fb-bd46-6d9rh25e0049',
+    description: 'Id do usuário'
+  })
+  userId: string;
+
+  @ApiProperty({
+    example: '2025-09-28T19:07:55.772',
+    description: 'Data de criação do carrinho',
+  })
+  createdAt: Date;
+
+  @ApiProperty({
+    example: '2025-09-28T19:07:55.772',
+    description: 'Data de atualização do carrinho',
+  })
+  updatedAt: Date;
+
+  @ApiProperty({
+    type: ProductResponseSwaggerDto,
+    description: 'Item do carrinho atualizado',
+    example: {
+      id: 1,
+      productId: 1,
+      quantity: 3,
+      name: 'Produto A',
+      price: '29.99',
+      imageUrl: 'https://example.com/image.jpg'
+    }
+  })
+  items: ProductResponseSwaggerDto; 
+  @ApiProperty({
+    example: 89.97,
+    description: 'Valor total dos itens do carrinho'
+  })
+  total: number
+  @ApiProperty({
+    example: 3,
+    description: 'Total do produto atualizado no carrinho'
+  })
+  itemsCount: number
+}

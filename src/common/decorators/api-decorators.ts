@@ -1,6 +1,6 @@
 import { applyDecorators } from "@nestjs/common";
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse } from "@nestjs/swagger";
-import { CreateCartSwaggerDtoBody, CreateCartSwaggerDtoResponse, CreateProductSwaggerDto, GetCartSwaggerDtoResponse, PaginatedProductsSwaggerDto, UpdateProductSwaggerDto } from "../swagger-types/product-example-swagger.dto";
+import { CreateCartSwaggerDtoBody, CreateCartSwaggerDtoResponse, CreateProductSwaggerDto, DeleteCartItemSwaggerDtoBody, GetCartSwaggerDtoResponse, PaginatedProductsSwaggerDto, UpdateCartItemSwaggerDtoBody, UpdateCartItemSwaggerDtoResponse, UpdateProductSwaggerDto } from "../swagger-types/product-example-swagger.dto";
 import { LoginSwaggerDto, UserRegisterSwaggerDto } from "../swagger-types/auth-example-swagger.dto";
 
 // Decorators das rotas de produtos
@@ -11,6 +11,7 @@ export function ApiListProductOperation(resourceName: string) {
       summary: `Listar ${resourceName}`,
       description: `Retorna lista paginada/filtrada de ${resourceName}`
       }),
+      ApiBearerAuth('JWT-auth'),
       ApiQuery ({ name: 'page', example: '1', required: false}), 
       ApiQuery ({ name: 'limit', example: '10', required: false}), 
       ApiQuery ({ name: 'name', example: 'notebook', required: false}), 
@@ -167,6 +168,7 @@ export function ApiUserRegisterOperation(resourceName : string){
       summary: `${resourceName} de usuário`,
       description: 'Registrar usuário na aplicação'
     }),
+    ApiBearerAuth('JWT-auth'),
     ApiBody({
       type: UserRegisterSwaggerDto,
       description: 'Dados para cadastro do usuário'
@@ -228,5 +230,75 @@ export function ApiCreateCartOperation(resourceName: string){
       status: 401,
       description: `Token JWT inválido ou expirado`
     }),
+  )
+}
+export function ApiDeleteCartItemOperation(resourceName: string) {
+  return applyDecorators(
+    ApiOperation({
+      summary: `Deletar um item do ${resourceName}`,
+      description: 'Deleta um item do carrinho de compras',
+    }),
+    ApiBody({
+      description: 'Id do produto a ser removido do carrinho',
+      type: DeleteCartItemSwaggerDtoBody,
+    }),
+    ApiBearerAuth('JWT-auth'),
+    ApiResponse({
+      status: 201,
+      description: 'Item deletado com sucesso'
+    }),
+    ApiResponse({
+      status: 404,
+      description: `Produto não encontrado`
+    }),
+    ApiResponse({
+      status: 401,
+      description: `Token JWT inválido ou expirado`
+    })
+  );
+}
+export function ApiDeleteCartOperation(resourceName: string) {
+  return applyDecorators(
+    ApiOperation({
+      summary: `Deletar um item do ${resourceName}`,
+      description: 'Deleta um item do carrinho de compras',
+    }),
+    ApiBearerAuth('JWT-auth'),
+    ApiResponse({
+      status: 200,
+      description: 'Carrinho deletado com sucesso'
+    }),
+    ApiResponse({
+      status: 401,
+      description: `Token JWT inválido ou expirado`
+    })
+  );
+}
+export function ApiUpdateQuantityInCartOperation(resourceName: string){
+  return applyDecorators(
+    ApiOperation({
+      summary: `Atualiza a quantidade de um item no ${resourceName}`,
+      description: "Atualiza a quantidade de um item no carrinho}"
+    }),
+    ApiBody({
+      description: 'Quantidade do item a ser atualizado no carrinho',
+      type: UpdateCartItemSwaggerDtoBody,
+    }),
+      ApiParam({
+      name: "id",
+      type: "number",
+      description: `ID do produto a ser atualizado no${resourceName}`,
+      example: 1,
+    }),
+    ApiBearerAuth('JWT-auth'),
+    ApiResponse({
+      status: 200,
+      description: 'Item atualizado no carrinho com sucesso',
+      type: UpdateCartItemSwaggerDtoResponse
+    }),
+    ApiResponse({
+      status: 401,
+      description: `Token JWT inválido ou expirado`
+    })
   )
 }
