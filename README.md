@@ -15,6 +15,7 @@ Esta é uma API de Marketplace desenvolvida para o desafio PS Desenvolvedor Back
 *   **Zod**: Biblioteca de validação de esquemas TypeScript-first.
 *   **ESLint**: Para manter a consistência do código.
 *   **Jest**: Framework de testes.
+*   **Swagger**: Documentação da API.
 
 ## Configuração do Projeto
 
@@ -55,17 +56,19 @@ JWT_SECRET="your_jwt_secret"
 
 Certifique-se de que o Docker esteja em execução. Em seguida, inicie os serviços de banco de dados e Redis:
 
+Este comando irá iniciar um contêiner PostgreSQL e um contêiner Redis.
+
 ```bash
 npm run services:up
 ```
 
-Este comando irá iniciar um contêiner PostgreSQL e um contêiner Redis.
+Esses comandos servem para pausar ou derrubar os serviços
 
 ```bash
 npm run services:stop
 npm run services:down
 ```
-Esses comandos servem para pausar ou derrubar os serviços
+
 
 ### Migrações do Banco de Dados
 
@@ -89,6 +92,11 @@ npm run start:dev
 
 A API estará disponível em `http://localhost:3000` (ou a porta configurada).
 
+### Documentação
+
+Documentação da API feita com Swagger dispinível em `http://localhost:3000/api/docs`
+
+
 ### Testes
 
 Para executar os testes:
@@ -96,7 +104,14 @@ Para executar os testes:
 ```bash
 # Executar todos os testes
 npm test
-
+```
 # Executar testes em modo watch
+```
 npm run test:watch
+```
+# Rodando o projeto(steps)
+- npm install
+- npm run services:up
+- npm run db:migrate
+- npm run start:dev
 
