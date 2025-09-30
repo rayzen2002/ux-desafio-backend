@@ -9,7 +9,7 @@
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
-    "start:dev": "npm run services:up && nest start --watch",
+    "start:dev": "npm run services:up && npm run wait-for-database npm && npm run db:migrate  && nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
@@ -23,7 +23,8 @@
     "services:down": "docker compose -f infra/compose.yaml down",
     "db:migrate": "drizzle-kit migrate",
     "db:generate": "drizzle-kit generate",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "wait-for-database": "tsx infra/scripts/wait-for-database.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
