@@ -53,8 +53,10 @@ JWT_SECRET="your_jwt_secret"
     ```
 
 # Rodando o projeto(steps)
-- npm install
-- npm run start:dev
+ ```
+ npm install
+ npm run start:dev
+ ```
 
 ### Configuração dos Serviços (Docker Compose)
 
