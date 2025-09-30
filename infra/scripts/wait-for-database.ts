@@ -27,8 +27,6 @@ class DrizzleHealthCheck {
       
       try {
         console.log(`Tentativa ${attempt} de ${this.maxRetries}`);
-
-        // Criar pool e cliente Drizzle
         pool = new Pool({
           host: config.host,
           port: config.port,
@@ -40,10 +38,8 @@ class DrizzleHealthCheck {
 
         const db = drizzle(pool);
 
-        // Testar conexão com uma query universal que não depende de tabelas
         const result = await db.execute(sql`SELECT 1 as connection_test`);
         
-        // Se chegou aqui, a conexão foi bem sucedida
         console.log('✅ Banco de dados está pronto e aceitando operações!');
         await pool.end();
         return true;
@@ -51,12 +47,12 @@ class DrizzleHealthCheck {
       } catch (error: any) {
         console.log(`❌ Tentativa ${attempt} falhou: ${error.message}`);
         
-        // Fechar pool se existir
+    
         if (pool) {
           try {
             await pool.end();
           } catch (e) {
-            // Ignora erro ao fechar pool com problema
+          
           }
         }
         

@@ -31,7 +31,7 @@ Certifique-se de ter as seguintes ferramentas instaladas:
 
 ### Variáveis de Ambiente
 
-Crie um arquivo `.env` na raiz do projeto, baseado no `.env.example` (se existir, ou crie um), e preencha as variáveis de ambiente necessárias. As variáveis mínimas esperadas são:
+Crie um arquivo `.env` na raiz do projeto, baseado no `.env.example`, e preencha as variáveis de ambiente necessárias. As variáveis mínimas esperadas são:
 
 ```
 DATABASE_URL="postgresql://user:password@localhost:5432/database_name"
@@ -51,6 +51,10 @@ JWT_SECRET="your_jwt_secret"
     ```bash
     npm install
     ```
+
+# Rodando o projeto(steps)
+- npm install
+- npm run start:dev
 
 ### Configuração dos Serviços (Docker Compose)
 
@@ -109,9 +113,6 @@ npm test
 ```
 npm run test:watch
 ```
-# Rodando o projeto(steps)
-- npm install
-- npm run services:up
-- npm run db:migrate
-- npm run start:dev
+
+
 
